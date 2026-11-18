@@ -1,5 +1,7 @@
+'use client';
+
 import { Loader2 } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { CategoryIcon } from '@/lib/icons';
 import { cn } from '@/lib/cn';
 import type { BudgetStatus } from '@/lib/types';
@@ -46,10 +48,23 @@ export function EmptyState({
 }
 
 export function Loading({ label = 'Carregando' }: { label?: string }) {
+  const [slow, setSlow] = useState(false);
+  useEffect(() => {
+    const id = setTimeout(() => setSlow(true), 6000);
+    return () => clearTimeout(id);
+  }, []);
+
   return (
-    <div className="flex items-center justify-center gap-2 py-16 text-sm text-ink-muted" role="status">
-      <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-      {label}
+    <div className="flex flex-col items-center justify-center gap-2 py-16 text-sm text-ink-muted" role="status">
+      <span className="flex items-center gap-2">
+        <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+        {label}
+      </span>
+      {slow && (
+        <span className="max-w-xs text-center text-xs">
+          O servidor pode estar acordando depois de um período parado. Isso leva até 1 minuto.
+        </span>
+      )}
     </div>
   );
 }

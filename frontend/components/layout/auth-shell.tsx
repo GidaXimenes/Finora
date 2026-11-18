@@ -1,6 +1,7 @@
 import { PiggyBank, ShieldCheck, Sparkles } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Logo } from './logo';
+import { WarmUp } from './warm-up';
 
 const POINTS = [
   { icon: PiggyBank, text: 'Veja para onde vai cada real, mês a mês.' },
@@ -29,6 +30,7 @@ export function AuthShell({ title, subtitle, children }: { title: string; subtit
         <p className="text-xs text-brand-300">Projeto de portfólio, feito com Next.js, NestJS e PostgreSQL.</p>
       </aside>
       <main className="flex items-center justify-center px-5 py-10">
+        <WarmUp />
         <div className="w-full max-w-sm">
           <Logo className="mb-8 lg:hidden" />
           <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>

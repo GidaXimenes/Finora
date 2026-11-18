@@ -51,7 +51,15 @@ function refreshSession(): Promise<boolean> {
   return refreshing;
 }
 
+/** Acorda a API (planos gratuitos hibernam) sem bloquear a tela. */
+export function wakeApi(): void {
+  void fetch('/api/health', { cache: 'no-store' }).catch(() => undefined);
+}
+
 async function readError(res: Response): Promise<string> {
+  if (res.status >= 502 && res.status <= 504) {
+    return 'O servidor está iniciando. Aguarde um instante e tente novamente.';
+  }
   if (res.status === 429) return 'Muitas tentativas. Aguarde um instante e tente de novo.';
   try {
     const data = await res.json();

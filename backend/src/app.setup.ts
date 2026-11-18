@@ -15,6 +15,7 @@ export function configureApp(app: INestApplication) {
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
   );
-  // Atrás do proxy do Next.js/Docker, usa o IP real do cliente no rate limit.
-  (app as NestExpressApplication).set('trust proxy', 1);
+  // Quantos proxies ficam na frente da API (balanceador + proxy do Next/Vercel).
+  // Define de onde vem o IP real do cliente, usado no rate limit.
+  (app as NestExpressApplication).set('trust proxy', Number(process.env.TRUST_PROXY_HOPS ?? 1));
 }
