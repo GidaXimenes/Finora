@@ -1,0 +1,52 @@
+# Só o banco (uso diário em desenvolvimento):
+#   docker compose up -d db
+# Aplicação completa em containers (teste de produção local):
+#   docker compose --profile full up --build
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: finora
+      POSTGRES_PASSWORD: finora
+      POSTGRES_DB: finora
+    ports:
+      - "5432:5432"
+    volumes:
+      - finora_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U finora -d finora"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    profiles: ["full"]
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://finora:finora@db:5432/finora?schema=public
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-troque-este-segredo-em-producao-1234567890}
+      FRONTEND_URL: http://localhost:3000
+      COOKIE_SECURE: "false"
+      PORT: "3001"
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+
+  frontend:
+    profiles: ["full"]
+    build:
+      context: ./frontend
+      args:
+        API_URL: http://backend:3001
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+
+volumes:
+  finora_db:

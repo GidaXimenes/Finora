@@ -1,0 +1,148 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AccountType {
+  CHECKING
+  SAVINGS
+  WALLET
+  INVESTMENT
+  OTHER
+}
+
+enum CategoryType {
+  INCOME
+  EXPENSE
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+  TRANSFER
+}
+
+enum PaymentMethod {
+  PIX
+  DEBIT
+  CASH
+  TRANSFER
+  OTHER
+}
+
+enum BudgetPeriod {
+  MONTHLY
+  YEARLY
+}
+
+model User {
+  id                  String         @id @default(uuid())
+  name                String
+  email               String         @unique
+  passwordHash        String
+  onboardingCompleted Boolean        @default(false)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  accounts            Account[]
+  categories          Category[]
+  transactions        Transaction[]
+  budgets             Budget[]
+  refreshTokens       RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+// Valores monetários sempre em centavos (Int). Nunca float.
+model Account {
+  id                  String        @id @default(uuid())
+  userId              String
+  name                String
+  type                AccountType   @default(CHECKING)
+  initialBalanceCents Int           @default(0)
+  color               String        @default("#468B7C")
+  active              Boolean       @default(true)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  user                User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions        Transaction[] @relation("TransactionAccount")
+  incomingTransfers   Transaction[] @relation("TransactionDestination")
+
+  @@index([userId])
+  @@map("accounts")
+}
+
+// userId nulo = categoria padrão do sistema (somente leitura).
+model Category {
+  id           String        @id @default(uuid())
+  userId       String?
+  name         String
+  type         CategoryType
+  color        String        @default("#8FA3A0")
+  icon         String        @default("tag")
+  isSystem     Boolean       @default(false)
+  active       Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  budgets      Budget[]
+
+  @@index([userId])
+  @@map("categories")
+}
+
+model Transaction {
+  id                   String          @id @default(uuid())
+  userId               String
+  type                 TransactionType
+  amountCents          Int
+  description          String
+  date                 DateTime        @db.Date
+  accountId            String
+  destinationAccountId String?
+  categoryId           String?
+  paymentMethod        PaymentMethod?
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+  user                 User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account              Account         @relation("TransactionAccount", fields: [accountId], references: [id], onDelete: Cascade)
+  destinationAccount   Account?        @relation("TransactionDestination", fields: [destinationAccountId], references: [id], onDelete: Cascade)
+  category             Category?       @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([userId, date])
+  @@index([accountId])
+  @@index([destinationAccountId])
+  @@index([categoryId])
+  @@map("transactions")
+}
+
+model Budget {
+  id         String       @id @default(uuid())
+  userId     String
+  categoryId String
+  limitCents Int
+  period     BudgetPeriod @default(MONTHLY)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category   Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, categoryId, period])
+  @@index([userId])
+  @@map("budgets")
+}

@@ -1,0 +1,14 @@
+{
+  "name": "finora",
+  "private": true,
+  "description": "Finora - controle financeiro pessoal (monorepo)",
+  "scripts": {
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
+    "install:all": "npm --prefix backend install && npm --prefix frontend install",
+    "dev:back": "npm --prefix backend run start:dev",
+    "dev:front": "npm --prefix frontend run dev",
+    "test": "npm --prefix backend test && npm --prefix frontend test",
+    "test:e2e": "npm --prefix backend run test:e2e"
+  }
+}
