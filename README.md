@@ -34,13 +34,13 @@ Principais decisões de projeto:
 
 ## Tecnologias
 
-| Camada | Tecnologias |
-|---|---|
-| Frontend | Next.js 14 (App Router), React, TypeScript, Tailwind CSS, TanStack Query, Recharts, driver.js |
-| Backend | NestJS 10, TypeScript, Passport/JWT, class-validator, Swagger |
-| Banco de dados | PostgreSQL 16, Prisma |
-| Qualidade | Jest, Supertest, Vitest |
-| Infraestrutura | Docker, Docker Compose, GitHub Actions |
+| Camada         | Tecnologias                                                                                   |
+| -------------- | --------------------------------------------------------------------------------------------- |
+| Frontend       | Next.js 14 (App Router), React, TypeScript, Tailwind CSS, TanStack Query, Recharts, driver.js |
+| Backend        | NestJS 10, TypeScript, Passport/JWT, class-validator, Swagger                                 |
+| Banco de dados | PostgreSQL 16, Prisma                                                                         |
+| Qualidade      | Jest, Supertest, Vitest                                                                       |
+| Infraestrutura | Docker, Docker Compose, GitHub Actions                                                        |
 
 ## Como executar
 
@@ -118,7 +118,7 @@ docs/       Requisitos, modelo de dados e arquitetura
 
 A aplicação foi pensada para rodar em planos gratuitos: frontend na Vercel, API no Render (Docker) e PostgreSQL no Neon. O repositório inclui o `render.yaml` e o passo a passo completo em [docs/04-deploy.md](docs/04-deploy.md).
 
-Demonstração: _link a ser adicionado após o deploy_
+Demonstração: https://finora-fintrack.vercel.app/
 
 ## Roadmap
 
